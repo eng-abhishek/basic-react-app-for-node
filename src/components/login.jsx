@@ -1,8 +1,8 @@
-import react,{useState} from 'react';
-import { useNavigate ,Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
 
-
-const login = () => {
+const Login = () => {
 
 const navigate = useNavigate();
 
@@ -11,7 +11,6 @@ const [formData, setFormData] = useState({'email':'','password':''});
 
 const handleEmailChange = (e) =>{
 // setFormData(e.target.value);
-
   setFormData({...formData,'email':e.target.value});
   console.log(e.target.value);
 }
@@ -22,10 +21,21 @@ const handlePasswordChange = (e) =>{
   console.log(e.target.value);
 }
 
-const handleSubmit = (e) => {
-console.log('Form submitted');
-    e.preventDefault(); 
+const handleSubmit = async (e) => {
 
+ e.preventDefault();
+
+ try{
+ 
+  const res = await axios.post('http://localhost:1000/api/user-login',formData);
+  
+  localStorage.setItem('token',res.data.token);
+  
+  navigate('/dashboard');
+  
+ }catch(error){
+  console.log(error);
+ }
 }
 
 return (<>
@@ -62,4 +72,4 @@ return (<>
 
 }
 
-export default login;
+export default Login;

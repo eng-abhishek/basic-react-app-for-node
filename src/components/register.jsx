@@ -1,8 +1,8 @@
-import react,{useState} from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-const register = () => {
+const Register = () => {
  
 const [formData, setFormData] = useState({'username':'','email':'','password':'','confirmPassword':'','dob':'','address':'','profile_image':''});
 const [successMessage, setSuccessMessage] = useState('');
@@ -112,4 +112,4 @@ return(<>
 
 }
 
-export default register;
+export default Register;
