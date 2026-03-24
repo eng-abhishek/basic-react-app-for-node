@@ -1,10 +1,23 @@
-import React from 'react';
+import React,{useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Dashboard = () => {
 
     const navigate = useNavigate();
+    
+    const token = localStorage.getItem('token');
+    const [userInfo,setUserInfo] = useState();
+
+    useEffect( async ()=>{
+     const res = await axios.get('http://localhost:1000/api/user-dashboard',{
+       headers:{
+        Authorization:`Bearer ${token}`,
+       }
+      });
+    //   setUserInfo(res);
+         console.log(res);
+    },[]);
 
     const handleLogout = async () => {
 
@@ -31,6 +44,7 @@ const Dashboard = () => {
 
     return (<>
         <h1>Dashboard</h1>
+         <p1>Name: {userInfo}</p1>
         <button className='btn btn-secondary' onClick={handleLogout}>Click To Logout</button>
     </>);
 }
