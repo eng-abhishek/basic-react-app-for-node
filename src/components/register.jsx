@@ -102,11 +102,10 @@ return(<>
 <div className='col-sm-2'>
 </div>
 
-<p className='text-center'>Don't have an account? <Link to="/register">Register here</Link></p>
+<p className='text-center'>Don't have an account? <Link to="/login">Login Here</Link></p>
 
 </div>
 </div>
-
 
    </>);
 
