@@ -1,113 +1,184 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import {SignUpFommSchema} from './SignUpFormSchema'
+import { useFormik } from "formik";
 
 const Register = () => {
- 
-const [formData, setFormData] = useState({'username':'','email':'','password':'','confirmPassword':'','dob':'','address':'','profile_image':''});
-const [successMessage, setSuccessMessage] = useState('');
-const [resetKey, setResetKey] = useState(0);
 
-const handleFormDataChange = (e) =>{
-    setFormData({...formData,[e.target.id]:e.target.value});
-}
+  /*
+  const [formData, setFormData] = useState({ 'username': '', 'email': '', 'password': '', 'confirmPassword': '', 'dob': '', 'address': '', 'profile_image': '' });
+  */
 
-const handleUserProfileChange = (e) => {
-    console.log(e.target.files[0]);
-    setFormData({...formData,'profile_image':e.target.files[0]});
-}
+  const [successMessage, setSuccessMessage] = useState('');
+  const [resetKey, setResetKey] = useState(0);
 
-const handleSubmit = (e) =>{
-  e.preventDefault();
-  try{
-    
-   axios.post('http://localhost:1000/api/user-register',formData,
-   {
-    headers:{
-        'Content-Type':'multipart/form-data',
-    }
-   }
-   ).then((response) => {
-     console.log(response);
-     setSuccessMessage('Registration successful!');
-     setFormData({'username':'','email':'','password':'','confirmPassword':'','dob':'','address':'','profile_image':''});
-     setResetKey(prev => prev + 1);
-     // Clear success message after 5 seconds
-     setTimeout(() => setSuccessMessage(''), 5000);
-   }).catch((error) => {
-     console.log(error);
-     // Optionally handle error
-   });
-  }catch(err){
-    console.log(err);
+  /*
+  const handleFormDataChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
   }
 
-}
+  const handleUserProfileChange = (e) => {
+    console.log(e.target.files[0]);
+    setFormData({ ...formData, 'profile_image': e.target.files[0] });
+  }
+  */
 
+  const initialRegisterInput = {
+   username:'',
+   email:'',
+   password:'',
+   confirmPassword:'',
+   dob:'',
+   address:'',
+   profile_image:''
+  };
 
-return(<>
-<div className='container'>
-<div className='row'>
-<div className='col-sm-2'></div>
-<div className='col-sm-8'>
-<h1>Register</h1>
+  const [handleChange, handleSubmit, values, errors, handleBlur, touched]  = useFormik({
+    initialValues:initialRegisterInput,
+    validationSchema:SignUpFommSchema,
+    onSubmit: async(value,{resetForm}) => {
+      try{
 
-<form onSubmit={handleSubmit}>
+      const res = await axios.post('http://localhost:1000/api/user-register',value,{
+      
+      headers: {
+            'Content-Type': 'multipart/form-data',
+          }
+      });
 
-<div className='form-group'>
-<label htmlFor='username'>Username</label>
-<input type='text' className='form-control' onChange={handleFormDataChange} id='username' placeholder='Enter username' value={formData.username} />
-</div>
+      console.log('Success:', res);
 
-<div className='form-group'>
-<label htmlFor='email'>Email</label>
-<input type='email' className='form-control' onChange={handleFormDataChange} id='email' placeholder='Enter email' value={formData.email} />
-</div>
+      setSuccessMessage('Registration successful!');
+      
+      resetForm();
 
+      setTimeout(() => setSuccessMessage(''), 5000);
+      }catch(error){
+         console.log(error);
+      }
+    }
+  });
 
-<div className='form-group'>
-<label htmlFor='password'>Password</label>
-<input type='password' className='form-control' onChange={handleFormDataChange} id='password' placeholder='Enter password' value={formData.password} />
-</div>
+  /*
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    try {
 
+      axios.post('http://localhost:1000/api/user-register', formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          }
+        }
+      ).then((response) => {
+        console.log(response);
+        setSuccessMessage('Registration successful!');
+        setFormData({ 'username': '', 'email': '', 'password': '', 'confirmPassword': '', 'dob': '', 'address': '', 'profile_image': '' });
+        setResetKey(prev => prev + 1);
+        // Clear success message after 5 seconds
+        setTimeout(() => setSuccessMessage(''), 5000);
+      }).catch((error) => {
+        console.log(error);
+        // Optionally handle error
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  */
 
-<div className='form-group'>
-<label htmlFor='confirmPassword'>Confirm Password</label>
-<input type='password' className='form-control' onChange={handleFormDataChange} id='confirmPassword' placeholder='Enter password' value={formData.confirmPassword} />
-</div>
+  return (<>
+    <div className="container py-5">
+      <div className="row justify-content-center">
+        <div className="col-12 col-lg-8">
+          <div className="card shadow border-0 rounded-3">
+            <div className="card-body p-4 p-md-5">
+              <h2 className="text-center mb-4 fw-bold text-primary">Create Your Account</h2>
 
-<div className='form-group'>
-<label htmlFor='dob'>DOB</label>
-<input type='date' className='form-control' onChange={handleFormDataChange} id='dob' placeholder='Enter date of birth' value={formData.dob} />
-</div>
+              <form onSubmit={handleSubmit}>
+                <div className="row">
+                  {/* Username */}
+                  <div className="col-md-6 mb-3">
+                    <label className="form-label fw-semibold" htmlFor="username">Username</label>
+                    <input type="text" className="form-control" id="username" placeholder="johndoe123" onChange={handleChange} value={values.username} />
+                      {errors.username && touched.username ? <span className='text-danger'>{errors.username}</span> : null}
+                  </div>
 
-<div className='form-group'>
-<label htmlFor='address'>Address</label>
-<input type='text' className='form-control' onChange={handleFormDataChange} id='address' placeholder='Enter address' value={formData.address} />
-</div>
+                  {/* Email */}
+                  <div className="col-md-6 mb-3">
+                    <label className="form-label fw-semibold" htmlFor="email">Email</label>
+                    <input type="email" className="form-control" id="email" placeholder="name@example.com" onChange={handleChange} value={values.email} />
+                       {errors.email && touched.email ? <span className='text-danger'>{errors.email}</span> : null}
+                
+                  </div>
 
+                  {/* Password */}
+                  <div className="col-md-6 mb-3">
+                    <label className="form-label fw-semibold" htmlFor="password">Password</label>
+                    <input type="password" className="form-control" id="password" placeholder="••••••••" onChange={handleChange} value={values.password} />
+                    {errors.password && touched.password ? <span className='text-danger'>{errors.password}</span> : null}
+                  </div>
 
-<div className='form-group'>
-<label htmlFor='profile_image'>Profile Image</label>
-<input type='file' className='form-control' onChange={handleUserProfileChange} id='profile_image' key={resetKey}/>
-</div>
+                  {/* Confirm Password */}
+                  <div className="col-md-6 mb-3">
+                    <label className="form-label fw-semibold" htmlFor="confirmPassword">Confirm Password</label>
+                    <input type="password" className="form-control" id="confirmPassword" placeholder="••••••••" onChange={handleChange} value={values.confirmPassword} />
+                    {errors.confirmPassword && touched.confirmPassword ? <span className='text-danger'>{errors.confirmPassword}</span> : null}
+                  </div>
 
-<br/>
-<button type='submit' className='btn btn-primary'>Register</button>
-</form>
+                  {/* DOB */}
+                  <div className="col-md-6 mb-3">
+                    <label className="form-label fw-semibold" htmlFor="dob">Date of Birth</label>
+                    <input type="date" className="form-control" id="dob" onChange={handleChange} value={values.dob} />
+                    {errors.dob && touched.dob ? <span className='text-danger'>{errors.dob}</span> : null}
+                  </div>
 
-{successMessage && <div className='alert alert-success mt-3'>{successMessage}</div>}
+                  {/* Profile Image */}
+                  
+                  {/*
+                  <div className="col-md-6 mb-3">
+                    <label className="form-label fw-semibold" htmlFor="profile_image">Profile Image</label>
+                    <input type="file" className="form-control" id="profile_image" key={resetKey} onChange={handleUserProfileChange} />
+                  </div>
+                  */}
+                
+                  <div className="col-md-6 mb-3">
+                    <label className="form-label fw-semibold" htmlFor="profile_image">Profile Image</label>
+                    <input type="file" className="form-control" id="profile_image" onChange={handleChange} />
+                  </div>
 
-</div>
-<div className='col-sm-2'>
-</div>
+                  {/* Address - Full Width */}
+                  <div className="col-12 mb-4">
+                    <label className="form-label fw-semibold" htmlFor="address">Address</label>
+                    <textarea className="form-control" id="address" rows="2" placeholder="Street, City, Zip Code" onChange={handleChange} value={values.address}></textarea>
+                  </div>
+                </div>
 
-<p className='text-center'>Don't have an account? <Link to="/login">Login Here</Link></p>
+                {/* Success Message Alert */}
+                {successMessage && (
+                  <div className="alert alert-success d-flex align-items-center mb-4" role="alert">
+                    <i className="bi bi-check-circle-fill me-2"></i>
+                    {successMessage}
+                  </div>
+                )}
 
-</div>
-</div>
-
-   </>);
+                {/* Register Button */}
+                <div className="d-grid gap-2">
+                  <button type="submit" className="btn btn-primary btn-lg shadow-sm">
+                    Register Now
+                  </button>
+                  <p className="text-center mt-3 mb-0">
+                    Already have an account? <Link to="/login" className="text-primary fw-bold text-decoration-none">Login Here</Link>
+                  </p>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </>);
 
 }
 
