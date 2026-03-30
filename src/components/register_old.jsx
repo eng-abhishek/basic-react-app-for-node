@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import {SignUpFommSchema} from './SignUpFormSchema'
@@ -6,9 +6,23 @@ import { useFormik } from "formik";
 
 const Register = () => {
 
+  /*
+  const [formData, setFormData] = useState({ 'username': '', 'email': '', 'password': '', 'confirmPassword': '', 'dob': '', 'address': '', 'profile_image': '' });
+  */
+
   const [successMessage, setSuccessMessage] = useState('');
   const [resetKey, setResetKey] = useState(0);
-  const fileRef = useRef();
+
+  /*
+  const handleFormDataChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  }
+
+  const handleUserProfileChange = (e) => {
+    console.log(e.target.files[0]);
+    setFormData({ ...formData, 'profile_image': e.target.files[0] });
+  }
+  */
 
   const initialRegisterInput = {
    username:'',
@@ -18,13 +32,12 @@ const Register = () => {
    dob:'',
    address:'',
    profile_image:'',
-   is_indian_citizon:false, // single chckbox
+   acceptTerms:false, // single chckbox
    skills:[],
    gender:'',
-   state:''
   };
 
-  const {handleChange, handleSubmit, values, errors, handleBlur, touched, setFieldValue}  = useFormik({
+  const {handleChange, handleSubmit, values, errors, handleBlur, touched}  = useFormik({
     initialValues:initialRegisterInput,
     validationSchema:SignUpFommSchema,
     onSubmit: async(value,{resetForm}) => {
@@ -42,14 +55,41 @@ const Register = () => {
       setSuccessMessage('Registration successful!');
       
       resetForm();
-      fileRef.current.value = null;
-      
+
       setTimeout(() => setSuccessMessage(''), 5000);
       }catch(error){
          console.log(error);
       }
     }
   });
+
+  /*
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    try {
+
+      axios.post('http://localhost:1000/api/user-register', formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          }
+        }
+      ).then((response) => {
+        console.log(response);
+        setSuccessMessage('Registration successful!');
+        setFormData({ 'username': '', 'email': '', 'password': '', 'confirmPassword': '', 'dob': '', 'address': '', 'profile_image': '' });
+        setResetKey(prev => prev + 1);
+        // Clear success message after 5 seconds
+        setTimeout(() => setSuccessMessage(''), 5000);
+      }).catch((error) => {
+        console.log(error);
+        // Optionally handle error
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  */
 
   return (<>
     <div className="container py-5">
@@ -98,11 +138,17 @@ const Register = () => {
                   </div>
 
                   {/* Profile Image */}
+                  
+                  {/*
+                  <div className="col-md-6 mb-3">
+                    <label className="form-label fw-semibold" htmlFor="profile_image">Profile Image</label>
+                    <input type="file" className="form-control" id="profile_image" key={resetKey} onChange={handleUserProfileChange} />
+                  </div>
+                  */}
                 
                   <div className="col-md-6 mb-3">
                     <label className="form-label fw-semibold" htmlFor="profile_image">Profile Image</label>
-                    <input type="file" ref={fileRef} className="form-control" id="profile_image" onChange={(event)=>{setFieldValue("profile_image", event.currentTarget.files[0])
-                    }} />
+                    <input type="file" className="form-control" id="profile_image" onChange={handleChange} />
                     {errors.profile_image && touched.profile_image ? <span className='text-danger'>{errors.profile_image}</span> : null}
                   </div>
 
@@ -113,56 +159,30 @@ const Register = () => {
                     {errors.address && touched.address ? <span className='text-danger'>{errors.address}</span> : null}
                   </div>
 
-
                   {/* Single Checkbox */}
                   <div className="col-12 mb-4">
                     <label className="form-label fw-semibold" htmlFor="address">Is Indian Citizon</label>
-                    <br/>
-                    <input type="checkbox" id="is_indian_citizon" checked={values.is_indian_citizon} onChange={handleChange} value={values.address} />
-                    <br/>
+                    <input type="checkbox" className="form-control" id="is_indian_citizon" checked={values.acceptTerms} onChange={handleChange} value={values.address} />
                     {errors.is_indian_citizon && touched.is_indian_citizon ? <span className='text-danger'>{errors.is_indian_citizon}</span> : null}
                   </div>
-
-                  {/* Select dropdown */}
-
-                  <div className="col-12 mb-4">
-                    <label className="form-label fw-semibold" htmlFor="address">Select State</label>
-                    
-                    <select id="state" name="state" className='form-control' onChange={handleChange} value={values.state}>
-                      <option value="">Select State</option>
-                      <option value="UP">UP</option>
-                      <option value="MP">MP</option>
-                      <option value="Delhi">Delhi</option>
-                      <option value="Maharastra">Maharastra</option>
-                      <option value="Kolkata">Kolkata</option>
-                    </select>
-                    {errors.state && touched.state ? <span className='text-danger'>{errors.state}</span> : null}
-                  </div>
-
 
                   {/* Multiple Checkbox : same name with diff values*/}
                   <div className="col-12 mb-4">
                     <label className="form-label fw-semibold" htmlFor="address">Skills</label>
-                    <br/>
-                    <input type="checkbox" name="skills" checked={values.skills.includes('Node')} value="Node" onChange={handleChange}/> : Node
+                    <input type="checkbox" name="skills" className="form-control" value="Node" onChange={handleChange}/> : Node
                     <br />
-                    <input type="checkbox" name="skills" checked={values.skills.includes('React')} value="React" onChange={handleChange}/> : React           
+                    <input type="checkbox" name="skills" className="form-control" value="React" onChange={handleChange}/> : React           
                     <br />
-                    <input type="checkbox" name="skills" checked={values.skills.includes('MongoDB')} value="MongoDB" onChange={handleChange}/> : MongoDB
-                    <br />
-                    {errors.skills && touched.skills ? <span className='text-danger'>{errors.skills}</span> : null}
-
+                    <input type="checkbox" name="skills" className="form-control" value="MongoDB" onChange={handleChange}/> : MongoDB
                   </div>
 
-                  {/* Manage gender */}
-                  <div className="col-12 mb-4">
+                {/* Manage gender */}
+                <div className="col-12 mb-4">
                     <label className="form-label fw-semibold" htmlFor="address">Gender</label>
-                    <br />
-                    <input type="radio" name="gender" value="male" checked={values.gender == 'male'} onChange={handleChange}  /> : Male
+                    <input type="radio" className="form-control" name="male" checked={values.gender == 'male'} onChange={handleChange}  /> : Male
                     <br/>
-                    <input type="radio" name="gender" value="female" checked={values.gender == 'female'} onChange={handleChange} /> : Female
-                    <br/>
-                    {errors.gender && touched.gender ? <span className='text-danger'>{errors.gender}</span> : null}
+                    <input type="radio" className="form-control" name="female" checked={values.gender == 'female'} onChange={handleChange} /> : Female
+                    {errors.is_indian_citizon && touched.is_indian_citizon ? <span className='text-danger'>{errors.is_indian_citizon}</span> : null}
                   </div>
 
                 </div>
