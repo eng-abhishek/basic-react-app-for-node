@@ -4,13 +4,15 @@ import Axios from 'axios'
 import Dashboard from './components/dashboard'
 import Login from './components/login'
 import Register from './components/register'
-import ProtectedRoute from './components/protectedRoute_old'
-
+import ProtectedRoute from './components/protectedRoute'
+import AdminDashboard from './components/AdminDashboard'
+import UserList from './components/UserList';
 
 function App() {
 
 // const isLoggedIn = localStorage.getItem('token');
 const isLoggedIn = localStorage.getItem('token');
+const userRole = localStorage.getItem('userRole');
 
 // const [isLoggedIn,setIsLoggedIn] = useState();
 
@@ -33,14 +35,24 @@ const isLoggedIn = localStorage.getItem('token');
         
          {/* check auth  */}
 
-        <Route path="/" element={isLoggedIn ? <Navigate to="/dashboard" /> : <Login/> }></Route>
-        <Route path="/login" element={isLoggedIn ? <Navigate to="/dashboard"  /> : <Login />}></Route>
-        <Route path="/register" element={isLoggedIn ? <Navigate to="/dashboard" /> : <Register/>}></Route>
+        <Route path="/" element={isLoggedIn ? (userRole === 'admin' ? <Navigate to="/admin-dashboard" /> : <Navigate to="/dashboard" />) : <Login/> }></Route>
+        <Route path="/login" element={<Login />}></Route>
+        <Route path="/register" element={isLoggedIn ? (userRole === 'admin' ? <Navigate to="/admin-dashboard" /> : <Navigate to="/dashboard" />) : <Register/>}></Route>
 
-        <Route element={<ProtectedRoute/>}>
+        {/* user protected routes */}
+        <Route element={<ProtectedRoute allowedRoles="user"/>}>
         <Route path="/dashboard" element={<Dashboard/>}></Route>
         </Route>
 
+        {/* admin protected routes */}
+        <Route element={<ProtectedRoute allowedRoles="admin"/>}>
+          <Route path="/admin-dashboard" element={<AdminDashboard/>}></Route>
+         <Route path="/user-list" element={<UserList/>}></Route>
+
+        </Route>
+
+
+        
       </Routes>
      </BrowserRouter>
     </>

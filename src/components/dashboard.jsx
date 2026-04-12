@@ -18,15 +18,12 @@ const Dashboard = () => {
         Authorization:`Bearer ${token}`,
        }
       });
-      console.log(res.data.userInfo);
         setUserInfo(res.data.userInfo);
     }
     getData();
     },[]);
 
-     const imgBase64 = userInfo?.profileImage;
-
-    //const imgBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==";
+    const imgBase64 = userInfo?.profileImage;
 
     const cleanBase64 = imgBase64?.replace(/\s/g, '');
 
@@ -50,40 +47,6 @@ const Dashboard = () => {
     }
 
     return (<>
-{/*
-<div className='container'>
-<div className='row pt-3'>
-<div className='col-sm-1'></div>
-<div className='col-sm-10'>
-
-<table className='table table-bordered'>
-<tr>
-    <th className='text-center h3' colSpan={5}>Dashboard</th>
-</tr>
-<tr>
-<th>Username</th>
-<th>Email</th>
-<th>DOB</th>
-<th>Address</th>
-<th>Profile Img</th>
-</tr>
-
-<tr>
-<td>{userInfo?.username}</td>
-<td>{userInfo?.email}</td>
-<td>{userInfo?.dob}</td>
-<td>{userInfo?.address}</td>
-<td><img src={`data:image/png;base64, ${cleanBase64}`} alt="profile" width="150px" height="150px"/></td>
-</tr>
-
-</table>
-</div>
-<div className='col-sm-1'></div>
-</div>
-</div>
-
-<button className='btn btn-secondary' onClick={handleLogout}>Click To Logout</button>
-*/}
 
 <div className="container py-5">
   <div className="row justify-content-center">

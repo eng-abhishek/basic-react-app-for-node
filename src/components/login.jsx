@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useFormik } from "formik";
 import { LoginFormSchema } from './LoginFormSchema';
@@ -8,6 +8,18 @@ import axios from 'axios';
 const Login = () => {
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userRole = localStorage.getItem('userRole');
+    if (token && userRole) {
+      if (userRole === 'admin') {
+        navigate('/admin-dashboard');
+      } else {
+        navigate('/dashboard');
+      }
+    }
+  }, [navigate]);
 
   const [formData, setFormData] = useState({ 'email': '', 'password': '' });
 
@@ -24,10 +36,18 @@ const Login = () => {
 
     try{
 
+
     const res = await axios.post('http://localhost:1000/api/user-login',value);
+
     localStorage.setItem('token', res.data.token);
+    localStorage.setItem('userRole', res.data.role);
+
     //console.log('Success:',res.data);
-    navigate('/dashboard');
+    if (res.data.role === 'admin') {
+      navigate('/admin-dashboard');
+    } else {
+      navigate('/dashboard');
+    }
     //resetForm();
 
     }catch(error){
