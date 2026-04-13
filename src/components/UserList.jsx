@@ -1,19 +1,45 @@
-import React,{useState,useEffect} from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
 
 const UserList = () => {
 
-return(<>
-  
+    const [userList, setUserList] = useState({});
+
+    useEffect(() => {
+
+    const getUserList = async () => {
+        try {
+            const res = await axios.get('http://localhost:1000/api/admin/users', {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                }
+            });
+
+            console.log('Response:', res.data);
+            setUserList(res.data);
+
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    getUserList();
+
+}, []);
+
+    return (<>
+
         <div className="container mt-4">
 
             {/* Page Header */}
             <div className="d-flex justify-content-between align-items-center mb-3">
-            <button 
-                className="btn btn-outline-secondary btn-sm"
-                onClick={() => navigate(-1)}
-            >
-                ← Back
-            </button>
+                <button
+                    className="btn btn-outline-secondary btn-sm"
+                    onClick={() => navigate(-1)}
+                >
+                    ← Back
+                </button>
 
                 <h3 className="mb-0">User List</h3>
 
@@ -42,7 +68,6 @@ return(<>
             {/* Table Card */}
             <div className="card shadow-sm">
                 <div className="card-body p-0">
-
                     <div className="table-responsive">
                         <table className="table table-hover mb-0">
 
@@ -56,12 +81,13 @@ return(<>
                                     <th className="text-end">Actions</th>
                                 </tr>
                             </thead>
-
                             <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>Mark Otto</td>
-                                    <td>mark@example.com</td>
+                                {userList.users && userList.users.map((value,index)=>{
+                                 return (
+                                    <tr key={value._id || index}>
+                                    <td>{index+1}</td>
+                                    <td>{value.username}</td>
+                                    <td>{value.email}</td>
                                     <td><span className="badge bg-primary">Admin</span></td>
                                     <td><span className="badge bg-success">Active</span></td>
                                     <td className="text-end">
@@ -75,46 +101,8 @@ return(<>
                                             Delete
                                         </button>
                                     </td>
-                                </tr>
-
-                                <tr>
-                                    <td>2</td>
-                                    <td>Jacob Thornton</td>
-                                    <td>jacob@example.com</td>
-                                    <td><span className="badge bg-secondary">User</span></td>
-                                    <td><span className="badge bg-warning text-dark">Pending</span></td>
-                                    <td className="text-end">
-                                        <button className="btn btn-sm btn-outline-secondary me-2">
-                                            More
-                                        </button>
-                                        <button className="btn btn-sm btn-outline-primary me-2">
-                                            Edit
-                                        </button>
-                                        <button className="btn btn-sm btn-outline-danger">
-                                            Delete
-                                        </button>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>3</td>
-                                    <td>Larry Bird</td>
-                                    <td>larry@example.com</td>
-                                    <td><span className="badge bg-secondary">User</span></td>
-                                    <td><span className="badge bg-success">Active</span></td>
-                                    <td className="text-end">
-                                        <button className="btn btn-sm btn-outline-secondary me-2">
-                                            More
-                                        </button>
-                                        <button className="btn btn-sm btn-outline-primary me-2">
-                                            Edit
-                                        </button>
-                                        <button className="btn btn-sm btn-outline-danger">
-                                            Delete
-                                        </button>
-                                    </td>
-                                </tr>
-
+                                </tr>);
+                                })}
                             </tbody>
 
                         </table>
@@ -148,7 +136,7 @@ return(<>
         </div>
 
 
-      </>);
+    </>);
 };
 
 export default UserList;
