@@ -1,32 +1,39 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import axios from "axios";
-
 
 const UserList = () => {
 
     const [userList, setUserList] = useState({});
+    const [page, setPage] = useState(1);
+    const [totalPage, setTotalPage] = useState(1);
+    const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
 
-    const getUserList = async () => {
+    const getUserList = async (page) => {
         try {
-            const res = await axios.get('http://localhost:1000/api/admin/users', {
+            setLoading(true);
+            const res = await axios.get(`http://localhost:1000/api/admin/users/?page=${page}&limit=10`, {
                 headers: {
                     'Authorization': 'Bearer ' + localStorage.getItem('token'),
                 }
             });
 
-            console.log('Response:', res.data);
-            setUserList(res.data);
 
+            setTotalPage(res.data.totalPages);
+            
+            setUserList(res.data);
+            setLoading(false); 
         } catch (error) {
             console.error('Error:', error);
+            setLoading(false);
         }
     };
 
-    getUserList();
+    useEffect(() => {
 
-}, []);
+        getUserList(page);
+
+}, [page]);
 
     return (<>
 
@@ -69,7 +76,10 @@ const UserList = () => {
             <div className="card shadow-sm">
                 <div className="card-body p-0">
                     <div className="table-responsive">
-                        <table className="table table-hover mb-0">
+                        {loading ? <p>Loading....</p> : (
+
+
+<table className="table table-hover mb-0">
 
                             <thead className="table-light">
                                 <tr>
@@ -88,7 +98,7 @@ const UserList = () => {
                                     <td>{index+1}</td>
                                     <td>{value.username}</td>
                                     <td>{value.email}</td>
-                                    <td><span className="badge bg-primary">Admin</span></td>
+                                    <td><span className="badge bg-primary">{ value.role[0].toUpperCase() + value.role.slice(1)}</span></td>
                                     <td><span className="badge bg-success">Active</span></td>
                                     <td className="text-end">
                                         <button className="btn btn-sm btn-outline-secondary me-2">
@@ -106,6 +116,12 @@ const UserList = () => {
                             </tbody>
 
                         </table>
+
+
+                        )}
+
+                        
+                        
                     </div>
 
                 </div>
@@ -117,17 +133,16 @@ const UserList = () => {
 
                 <nav>
                     <ul className="pagination mb-0">
-                        <li className="page-item disabled">
-                            <button className="page-link">Previous</button>
+                        <li className="page-item">
+                            <button className="page-link" disabled={page === 1} onClick={()=>setPage(page-1)}>Previous</button>
                         </li>
+
                         <li className="page-item active">
-                            <button className="page-link">1</button>
+                            <button className="page-link">{page} of {totalPage}</button>
                         </li>
+
                         <li className="page-item">
-                            <button className="page-link">2</button>
-                        </li>
-                        <li className="page-item">
-                            <button className="page-link">Next</button>
+                            <button className="page-link" disabled={page === totalPage} onClick={()=>setPage(page+1)}>Next</button>
                         </li>
                     </ul>
                 </nav>

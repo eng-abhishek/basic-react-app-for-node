@@ -48,10 +48,7 @@ const userRole = localStorage.getItem('userRole');
         <Route element={<ProtectedRoute allowedRoles="admin"/>}>
           <Route path="/admin-dashboard" element={<AdminDashboard/>}></Route>
          <Route path="/user-list" element={<UserList/>}></Route>
-
         </Route>
-
-
         
       </Routes>
      </BrowserRouter>
